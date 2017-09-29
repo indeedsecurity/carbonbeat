@@ -1,0 +1,7 @@
+################### Carbonbeat Configuration Example #########################
+
+############################# Carbonbeat ######################################
+
+carbonbeat:
+  # Defines how often an event is sent to the output
+  period: 1s

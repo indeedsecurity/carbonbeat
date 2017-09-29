@@ -1,0 +1,5 @@
+= Carbonbeat Docs
+
+Welcome to the Carbonbeat documentation.
+
+
