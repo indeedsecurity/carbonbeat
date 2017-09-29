@@ -5,10 +5,20 @@ package config
 
 import "time"
 
+// Config has custom options for Carbonbeat
 type Config struct {
 	Period time.Duration `config:"period"`
+	Type   string
+
+	API struct {
+		ID   string
+		Key  string
+		Host string
+	}
 }
 
+// DefaultConfig contains defaults for custom options
 var DefaultConfig = Config{
-	Period: 1 * time.Second,
+	Period: 5 * time.Minute,
+	Type:   "cb",
 }

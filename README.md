@@ -1,15 +1,22 @@
 # Carbonbeat
 
-Welcome to Carbonbeat.
+Carbonbeat currently supports shipping notifications from the notifications API.
+
+## Getting Started with Carbonbeat
+
+Like any other beat, customize `carbonbeat.full.yml` to your liking and go.
+
+There is a multistage Dockerfile included. It does not include the config.
+
+## Developer stuff
 
 Ensure that this folder is at the following location:
 `${GOPATH}/github.com/indeedsecurity/carbonbeat`
 
-## Getting Started with Carbonbeat
-
 ### Requirements
 
 * [Golang](https://golang.org/dl/) 1.7+
+* [dep](https://github.com/golang/dep) package manager
 
 ### Init Project
 To get running with Carbonbeat and also install the
@@ -116,4 +123,4 @@ The beat frameworks provides tools to crosscompile and package your beat for dif
 make package
 ```
 
-This will fetch and create all images required for the build process. The hole process to finish can take several minutes.
+This will fetch and create all images required for the build process. The whole process to finish can take several minutes.

@@ -1,7 +1,8 @@
-/.idea
+qq/.idea
 /build
-
+/vendor
 .DS_Store
 /carbonbeat
 /carbonbeat.test
 *.pyc
+carbonbeat.yml
