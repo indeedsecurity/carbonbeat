@@ -62,14 +62,14 @@ func (bt *Carbonbeat) Run(b *beat.Beat) error {
 
 		notifications, err := bt.cb.Fetch()
 		if err != nil {
-			logp.Critical("fetching notifications from the API failed")
-			continue
+			logp.Critical("fetching notifications from the API failed, got: ", err)
+			return nil
 		}
 
 		processedNotifications, err := bt.processNotifications(notifications)
 		if err != nil {
-			logp.Critical("processing notifications failed because of: %s", err.Error())
-			continue
+			logp.Critical("processing notifications failed because of: ", err)
+			return nil
 		}
 
 		// goes to output
@@ -83,7 +83,7 @@ func (bt *Carbonbeat) Run(b *beat.Beat) error {
 func (bt *Carbonbeat) Stop() {
 	err := bt.client.Close()
 	if err != nil {
-		logp.Critical("stopping the beat client failed because of: %s", err.Error())
+		logp.Critical("stopping the beat client failed because of: ", err)
 	}
 	close(bt.done)
 }
