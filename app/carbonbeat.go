@@ -1,4 +1,4 @@
-package beater
+package app
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
 
-	"github.com/indeedsecurity/carbonbeat/beater/carbonclient"
+	"github.com/indeedsecurity/carbonbeat/carbonclient"
 	"github.com/indeedsecurity/carbonbeat/config"
 )
 

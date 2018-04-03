@@ -1,11 +1,11 @@
-package beater
+package app
 
 import (
 	"time"
 
-	"github.com/indeedsecurity/carbonbeat/beater/carbonclient"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/indeedsecurity/carbonbeat/carbonclient"
 )
 
 func (bt *Carbonbeat) processNotifications(n carbonclient.Notifications) ([]common.MapStr, error) {
