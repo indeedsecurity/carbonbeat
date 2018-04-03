@@ -9,11 +9,11 @@ import (
 )
 
 func (bt *Carbonbeat) processNotifications(n carbonclient.Notifications) ([]common.MapStr, error) {
-	var events []common.MapStr
+	var notifications []common.MapStr
 	if n.Success {
-		logp.Debug("api", "%v events collected", len(n.Events))
+		logp.Debug("api", "%v events collected", len(n.Notifications))
 
-		for _, e := range n.Events {
+		for _, e := range n.Notifications {
 			event := common.MapStr{
 				"@timestamp": common.Time(time.Now()),
 				"timestamp":  e.EventTime,
@@ -36,11 +36,11 @@ func (bt *Carbonbeat) processNotifications(n carbonclient.Notifications) ([]comm
 					"targetPriorityCode": e.DeviceInfo.TargetPriorityCode,
 				},
 			}
-			events = append(events, event)
+			notifications = append(notifications, event)
 		}
-		return events, nil
+		return notifications, nil
 	}
-	logp.Warn("something went wrong the thing, because notifications['success'] was false for what ever reason. good luck."+
+	logp.Warn("something went wrong, because notifications['success'] was false for what ever reason. good luck."+
 		"here's whatever they gave us: %v", n)
-	return events, nil
+	return notifications, nil
 }

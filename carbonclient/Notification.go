@@ -1,7 +1,7 @@
 package carbonclient
 
-// Event is the structure of one event from CB
-type Event struct {
+// Notification is the structure of one notification event from CB
+type Notification struct {
 	ThreatInfo struct {
 		IncidentID string `json:"incidentId"`
 		Score      int    `json:"score"`
@@ -34,9 +34,9 @@ type Event struct {
 	Type     string `json:"type"`
 }
 
-// Notifications is the array of Events sent back from CB
+// Notifications is the array of Notification sent back from CB
 type Notifications struct {
-	Events  []Event `json:"notifications"`
-	Success bool    `json:"success"`
-	Message string  `json:"message"`
+	Notifications []Notification `json:"notifications"`
+	Success       bool           `json:"success"`
+	Message       string         `json:"message"`
 }
