@@ -36,8 +36,8 @@ func New(opts Options) (Client, error) {
 	return c, nil
 }
 
-// Fetch returns a batch of messages since t, time.Location
-func (c *Client) Fetch() (Notifications, error) {
+// FetchNotifications returns a batch of messages since t, time.Location
+func (c *Client) FetchNotifications() (Notifications, error) {
 	var events Notifications
 	endpoint := fmt.Sprintf(
 		"%s/integrationServices/v3/notification",
@@ -63,7 +63,7 @@ func (c *Client) Fetch() (Notifications, error) {
 			return events, err
 		}
 		logp.Debug("api", "API response body: %s", body)
-		events, err = parseResBody(body)
+		events, err = parseNotificationsResBody(body)
 		return events, err
 	case 400:
 		body, err := ioutil.ReadAll(resp.Body)

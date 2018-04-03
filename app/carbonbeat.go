@@ -60,7 +60,7 @@ func (bt *Carbonbeat) Run(b *beat.Beat) error {
 		case <-ticker.C:
 		}
 
-		notifications, err := bt.cb.Fetch()
+		notifications, err := bt.cb.FetchNotifications()
 		if err != nil {
 			logp.Critical("fetching notifications from the API failed, got: ", err)
 			return nil

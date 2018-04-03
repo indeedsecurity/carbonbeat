@@ -8,7 +8,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-func parseResBody(body []byte) (Notifications, error) {
+func parseNotificationsResBody(body []byte) (Notifications, error) {
 	var events Notifications
 	err := json.Unmarshal(body, &events)
 	if err != nil {

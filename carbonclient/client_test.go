@@ -6,12 +6,12 @@ import (
 )
 
 func TestParseRes(t *testing.T) {
-	buffer, err := ioutil.ReadFile("sample_data.json")
+	buffer, err := ioutil.ReadFile("sample_notifications_data.json")
 	if err != nil {
 		t.Error(err.Error())
 	}
 
-	_, err = parseResBody(buffer)
+	_, err = parseNotificationsResBody(buffer)
 	if err != nil {
 		t.Error(err.Error())
 	}
