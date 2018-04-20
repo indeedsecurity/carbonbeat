@@ -23,7 +23,10 @@ func (bt *Carbonbeat) processNotifications(n carbonclient.Notifications) ([]comm
 				"src_host":   e.DeviceInfo.DeviceName,
 				"dst_ip":     e.DeviceInfo.ExternalIPAddress,
 				"user":       e.DeviceInfo.Email,
+				"message":    e.EventDescription,
 				"cb": common.MapStr{
+					"eventID":            e.EventID,
+					"incidentID":         e.ThreatInfo.IncidentID,
 					"notificationType":   e.Type,
 					"ruleName":           e.RuleName,
 					"indicators":         e.ThreatInfo.Indicators,
