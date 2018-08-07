@@ -36,14 +36,20 @@ func (bt *Carbonbeat) processNotifications(n carbonclient.Notifications) ([]comm
 			}
 
 			if e.ThreatInfo.IncidentID != "" {
-				event.Put("cb.threat_info", e.ThreatInfo)
+				for indicator := range e.ThreatInfo.Indicators {
+					event.Put("cb.threat_info.incident_id", e.ThreatInfo.IncidentID)
+					event.Put("cb.threat_info.score", e.ThreatInfo.Score)
+					event.Put("cb.threat_info.summary", e.ThreatInfo.Summary)
+					event.Put("cb.threat_info.indicator", indicator)
+					notifications = append(notifications, event)
+				}
 			}
 
 			if e.PolicyAction.Action != "" {
 				event.Put("cb.policy_action", e.PolicyAction)
+				notifications = append(notifications, event)
 			}
 
-			notifications = append(notifications, event)
 		}
 		return notifications, nil
 	}
