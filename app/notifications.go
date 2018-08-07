@@ -36,7 +36,7 @@ func (bt *Carbonbeat) processNotifications(n carbonclient.Notifications) ([]comm
 			}
 
 			if e.ThreatInfo.IncidentID != "" {
-				for indicator := range e.ThreatInfo.Indicators {
+				for _, indicator := range e.ThreatInfo.Indicators {
 					event.Put("cb.threat_info.incident_id", e.ThreatInfo.IncidentID)
 					event.Put("cb.threat_info.score", e.ThreatInfo.Score)
 					event.Put("cb.threat_info.summary", e.ThreatInfo.Summary)
