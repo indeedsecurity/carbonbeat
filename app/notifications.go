@@ -17,7 +17,7 @@ func (bt *Carbonbeat) processNotifications(n carbonclient.Notifications) ([]comm
 			event := common.MapStr{
 				"@timestamp": common.Time(time.Now()),
 				"timestamp":  e.EventTime,
-				"type":       bt.config.Type,
+				"type":       e.Type,
 				"url":        e.URL,
 				"src_ip":     e.DeviceInfo.InternalIPAddress,
 				"src_host":   e.DeviceInfo.DeviceName,
@@ -25,20 +25,24 @@ func (bt *Carbonbeat) processNotifications(n carbonclient.Notifications) ([]comm
 				"user":       e.DeviceInfo.Email,
 				"message":    e.EventDescription,
 				"cb": common.MapStr{
-					"eventID":            e.EventID,
-					"incidentID":         e.ThreatInfo.IncidentID,
-					"notificationType":   e.Type,
-					"ruleName":           e.RuleName,
-					"indicators":         e.ThreatInfo.Indicators,
-					"incidentScore":      e.ThreatInfo.Score,
-					"summary":            e.ThreatInfo.Summary,
-					"deviceVersion":      e.DeviceInfo.DeviceVersion,
-					"deviceType":         e.DeviceInfo.DeviceType,
-					"policyName":         e.DeviceInfo.GroupName,
-					"targetPriorityType": e.DeviceInfo.TargetPriorityType,
-					"targetPriorityCode": e.DeviceInfo.TargetPriorityCode,
+					"event_id":             e.EventID,
+					"rule_name":            e.RuleName,
+					"device_version":       e.DeviceInfo.DeviceVersion,
+					"device_type":          e.DeviceInfo.DeviceType,
+					"group_name":           e.DeviceInfo.GroupName,
+					"target_priority_type": e.DeviceInfo.TargetPriorityType,
+					"target_priority_code": e.DeviceInfo.TargetPriorityCode,
 				},
 			}
+
+			if e.ThreatInfo.IncidentID != "" {
+				event.Put("cb.threat_info", e.ThreatInfo)
+			}
+
+			if e.PolicyAction.Action != "" {
+				event.Put("cb.policy_action", e.PolicyAction)
+			}
+
 			notifications = append(notifications, event)
 		}
 		return notifications, nil

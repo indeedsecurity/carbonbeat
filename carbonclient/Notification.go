@@ -2,6 +2,12 @@ package carbonclient
 
 // Notification is the structure of one notification event from CB
 type Notification struct {
+	PolicyAction struct {
+		Sha256Hash      string `json:"sha256Hash"`
+		Action          string `json:"action"`
+		Reputation      string `json:"reputation"`
+		ApplicationName string `json:"applicationName"`
+	} `json:"policyAction,omitempty"`
 	ThreatInfo struct {
 		IncidentID string `json:"incidentId"`
 		Score      int    `json:"score"`
@@ -12,7 +18,7 @@ type Notification struct {
 			IndicatorName   string `json:"indicatorName"`
 		} `json:"indicators"`
 		Time int64 `json:"time"`
-	} `json:"threatInfo"`
+	} `json:"threatInfo,omitempty"`
 	URL              string `json:"url"`
 	EventTime        int64  `json:"eventTime"`
 	EventID          string `json:"eventId"`
