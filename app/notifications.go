@@ -15,6 +15,7 @@ func (bt *Carbonbeat) processNotifications(n carbonclient.Notifications) ([]comm
 
 		for _, e := range n.Notifications {
 			event := common.MapStr{
+				// fields common b/w event types
 				"@timestamp": common.Time(time.Now()),
 				"timestamp":  e.EventTime,
 				"type":       e.Type,
@@ -24,27 +25,31 @@ func (bt *Carbonbeat) processNotifications(n carbonclient.Notifications) ([]comm
 				"dst_ip":     e.DeviceInfo.ExternalIPAddress,
 				"user":       e.DeviceInfo.Email,
 				"message":    e.EventDescription,
+
+				// fields specific to cb defense
 				"cb": common.MapStr{
-					"event_id":             e.EventID,
 					"rule_name":            e.RuleName,
 					"device_version":       e.DeviceInfo.DeviceVersion,
 					"device_type":          e.DeviceInfo.DeviceType,
+					"device_id":            e.DeviceInfo.DeviceID,
 					"group_name":           e.DeviceInfo.GroupName,
 					"target_priority_type": e.DeviceInfo.TargetPriorityType,
 					"target_priority_code": e.DeviceInfo.TargetPriorityCode,
 				},
 			}
 
+			// fields specific to threatInfo events
 			if e.ThreatInfo.IncidentID != "" {
-				for _, indicator := range e.ThreatInfo.Indicators {
-					event.Put("cb.threat_info.incident_id", e.ThreatInfo.IncidentID)
-					event.Put("cb.threat_info.score", e.ThreatInfo.Score)
-					event.Put("cb.threat_info.summary", e.ThreatInfo.Summary)
-					event.Put("cb.threat_info.indicator", indicator)
-					notifications = append(notifications, event)
-				}
+				event.Put("cb.threat_info.incident_id", e.ThreatInfo.IncidentID)
+				event.Put("cb.threat_info.score", e.ThreatInfo.Score)
+				event.Put("cb.threat_info.summary", e.ThreatInfo.Summary)
+
+				event.Put("cb.threat_info.indicators", e.ThreatInfo.Indicators)
+				event.Put("cb.threat_info.threat_cause", e.ThreatInfo.ThreatCause)
+				notifications = append(notifications, event)
 			}
 
+			// fields specific to policyAction events
 			if e.PolicyAction.Action != "" {
 				event.Put("cb.policy_action", e.PolicyAction)
 				notifications = append(notifications, event)
