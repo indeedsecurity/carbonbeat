@@ -60,6 +60,10 @@ func (bt *Carbonbeat) Run(b *beat.Beat) error {
 			logp.Warn("recieved done signal, shutting down")
 			return nil
 		case <-ticker.C:
+			//Remove all ticks from the ticker channel, do not "catch up"
+			for len(ticker.C) > 0 {
+				<-ticker.C
+			}
 		}
 
 		notifications, err := bt.cb.FetchNotifications()

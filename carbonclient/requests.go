@@ -28,7 +28,7 @@ func authenticatedGet(c *Client, e string) (*http.Response, error) {
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		logp.Err(err.Error())
-		time.Sleep(15 * time.Minute)
+		time.Sleep(3 * time.Minute)
 		return resp, err
 	}
 
