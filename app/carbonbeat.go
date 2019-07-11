@@ -50,6 +50,8 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 func (bt *Carbonbeat) Run(b *beat.Beat) error {
 	logp.Info("Carbonbeat is running! Hit CTRL-C to stop it.")
 
+	const maxRetryLimit = 3
+	failsSinceLastTry := 0
 	bt.client = b.Publisher.Connect()
 	ticker := time.NewTicker(bt.config.Period)
 	for {
@@ -62,8 +64,13 @@ func (bt *Carbonbeat) Run(b *beat.Beat) error {
 
 		notifications, err := bt.cb.FetchNotifications()
 		if err != nil {
+			if failsSinceLastTry > maxRetryLimit {
+				return err
+			}
+			failsSinceLastTry++
 			logp.Critical("fetching notifications from the API failed, got: ", err)
-			return nil
+		} else {
+			failsSinceLastTry = 0
 		}
 
 		processedNotifications, err := bt.processNotifications(notifications)
@@ -74,6 +81,7 @@ func (bt *Carbonbeat) Run(b *beat.Beat) error {
 
 		// goes to output
 		bt.client.PublishEvents(processedNotifications, publisher.Guaranteed)
+		logp.Info("Sent %d events", len(processedNotifications))
 		logp.Debug("api", "events sent: %v", processedNotifications)
 	}
 }
