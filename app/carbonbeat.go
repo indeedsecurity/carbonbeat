@@ -30,9 +30,12 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 
 	// authenticated carbonblack API client
 	cb, err := carbonclient.New(carbonclient.Options{
-		ConnectorID: config.API.ID,
-		APIKey:      config.API.Key,
-		APIHost:     config.API.Host,
+		APIConnectorID:  config.API.ID,
+		APIKey:          config.API.Key,
+		APIHost:         config.API.Host,
+		SIEMConnectorID: config.SIEM.ID,
+		SIEMKey:         config.SIEM.Key,
+		SIEMHost:        config.SIEM.Host,
 	})
 	if err != nil {
 		return nil, err
@@ -51,7 +54,8 @@ func (bt *Carbonbeat) Run(b *beat.Beat) error {
 	logp.Info("Carbonbeat is running! Hit CTRL-C to stop it.")
 
 	const maxRetryLimit = 3
-	failsSinceLastTry := 0
+	siemFailsSinceLastSuccess := 0
+	apiFailsSinceLastSuccess := 0
 	bt.client = b.Publisher.Connect()
 	ticker := time.NewTicker(bt.config.Period)
 	for {
@@ -65,28 +69,28 @@ func (bt *Carbonbeat) Run(b *beat.Beat) error {
 				<-ticker.C
 			}
 		}
-
-		notifications, err := bt.cb.FetchNotifications()
-		if err != nil {
-			if failsSinceLastTry > maxRetryLimit {
-				return err
+		//These could be moved to goroutines, but that isn't currently necessary
+		siemErr := bt.FetchAndSendSIEMEvents()
+		if siemErr != nil {
+			if siemFailsSinceLastSuccess > maxRetryLimit {
+				return siemErr
 			}
-			failsSinceLastTry++
-			logp.Critical("fetching notifications from the API failed, got: ", err)
+			siemFailsSinceLastSuccess++
+			logp.Critical("Fetching SIEM events failed, got: %s", siemErr)
 		} else {
-			failsSinceLastTry = 0
+			siemFailsSinceLastSuccess = 0
 		}
 
-		processedNotifications, err := bt.processNotifications(notifications)
-		if err != nil {
-			logp.Critical("processing notifications failed because of: ", err)
-			return nil
+		apiErr := bt.FetchAndSendAPIEvents()
+		if apiErr != nil {
+			if apiFailsSinceLastSuccess > maxRetryLimit {
+				return apiErr
+			}
+			apiFailsSinceLastSuccess++
+			logp.Critical("Fetching API events failed, got: %s", apiErr)
+		} else {
+			apiFailsSinceLastSuccess = 0
 		}
-
-		// goes to output
-		bt.client.PublishEvents(processedNotifications, publisher.Guaranteed)
-		logp.Info("Sent %d events", len(processedNotifications))
-		logp.Debug("api", "events sent: %v", processedNotifications)
 	}
 }
 
@@ -98,4 +102,42 @@ func (bt *Carbonbeat) Stop() {
 		logp.Critical("stopping the beat client failed because of: ", err)
 	}
 	close(bt.done)
+}
+
+//FetchAndSendSIEMEvents fetches the carbonblack events from the SIEM key, marshalls them into a map and
+//sends them to the configured output
+func (bt *Carbonbeat) FetchAndSendSIEMEvents() error {
+	//That endpoint is for carbonblack event notifications
+	notifications, err := bt.cb.FetchSIEMEvents("/integrationServices/v3/notification")
+	if err != nil {
+		logp.Critical("fetching notifications from the API failed, got: %s", err)
+		return err
+	}
+	processedNotifications, err := bt.processNotifications(notifications)
+	if err != nil {
+		logp.Critical("processing notifications failed because of: %s", err)
+		return err
+	}
+	bt.client.PublishEvents(processedNotifications, publisher.Guaranteed)
+	logp.Debug("api", "notification events sent: %v", processedNotifications)
+	return nil
+}
+
+//FetchAndSendAPIEvents fetches the carbonblack audit log events, marshalls them into a map
+//and sends them to the configured output
+func (bt *Carbonbeat) FetchAndSendAPIEvents() error {
+	//That endpoint is for carbonblack audit log events
+	events, err := bt.cb.FetchAPIEvents("/integrationServices/v3/auditlogs")
+	if err != nil {
+		logp.Critical("fetching audit events from the API failed, got: %s", err)
+		return err
+	}
+	processedEvents, err := bt.processAuditEvents(events)
+	if err != nil {
+		logp.Critical("processing events failed because of: %s", err)
+		return err
+	}
+	bt.client.PublishEvents(processedEvents, publisher.Guaranteed)
+	logp.Debug("api", "audit events sent: %v", processedEvents)
+	return nil
 }
