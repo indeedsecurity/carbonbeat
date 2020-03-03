@@ -17,6 +17,7 @@ func (bt *Carbonbeat) processAuditEvents(ae carbonclient.AuditEvents) ([]common.
 			event := common.MapStr{
 				"@timestamp":  common.Time(time.Now()),
 				"timestamp":   e.EventTime,
+				"cb_type":     "audit",
 				"eventId":     e.EventID,
 				"loginName":   e.LoginName,
 				"orgName":     e.OrgName,

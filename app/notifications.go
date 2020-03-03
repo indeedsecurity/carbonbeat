@@ -18,6 +18,7 @@ func (bt *Carbonbeat) processNotifications(n carbonclient.Notifications) ([]comm
 				// fields common b/w event types
 				"@timestamp": common.Time(time.Now()),
 				"timestamp":  e.EventTime,
+				"cb_type":    "notification",
 				"type":       e.Type,
 				"url":        e.URL,
 				"src_ip":     e.DeviceInfo.InternalIPAddress,
