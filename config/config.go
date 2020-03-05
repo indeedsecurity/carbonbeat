@@ -15,6 +15,11 @@ type Config struct {
 		Key  string
 		Host string
 	}
+	SIEM struct {
+		ID   string
+		Key  string
+		Host string
+	}
 }
 
 // DefaultConfig contains defaults for custom options
