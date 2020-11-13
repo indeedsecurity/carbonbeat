@@ -99,7 +99,7 @@ func (bt *Carbonbeat) Run(b *beat.Beat) error {
 func (bt *Carbonbeat) Stop() {
 	err := bt.client.Close()
 	if err != nil {
-		logp.Critical("stopping the beat client failed because of: ", err)
+		logp.Critical(fmt.Sprintf("stopping the beat client failed because of: %s", err.Error()))
 	}
 	close(bt.done)
 }
