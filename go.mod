@@ -9,7 +9,7 @@ require (
 	github.com/eapache/go-resiliency v1.0.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20160609142408-bb955e01b934 // indirect
 	github.com/eapache/queue v1.0.2 // indirect
-	github.com/elastic/beats v5.6.2+incompatible
+	github.com/elastic/beats v5.6.4+incompatible
 	github.com/elastic/go-lumber v0.1.0 // indirect
 	github.com/elastic/go-ucfg v0.4.6 // indirect
 	github.com/garyburd/redigo v1.1.0 // indirect
